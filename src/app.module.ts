@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthorModule } from './author/author.module';
 import { GenreModule } from './genre/genre.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { GenreModule } from './genre/genre.module';
     BookModule,
     AuthorModule,
     GenreModule,
+    ReviewModule,
   ],
   controllers: [AppController],
   providers: [AppService],

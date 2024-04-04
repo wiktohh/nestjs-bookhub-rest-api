@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  db-dev:
+    image: postgres:16.2
+    environment:
+      POSTGRES_DB: nestjs-bookhub-rest-api
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+    ports:
+      - 5434:5432

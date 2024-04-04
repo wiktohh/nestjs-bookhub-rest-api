@@ -1,5 +1,4 @@
-import { Req } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 export class UserService {
   constructor(private prisma: PrismaService) {}

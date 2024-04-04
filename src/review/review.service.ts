@@ -1,6 +1,8 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AddReviewDto, EditReviewDto } from './dto';
+import { Inject, Injectable } from '@nestjs/common';
 
+@Injectable()
 export class ReviewService {
   constructor(private prisma: PrismaService) {}
 

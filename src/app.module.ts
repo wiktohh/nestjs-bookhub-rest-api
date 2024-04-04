@@ -7,6 +7,7 @@ import { BookModule } from './book/book.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthorModule } from './author/author.module';
+import { GenreModule } from './genre/genre.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthorModule } from './author/author.module';
     UserModule,
     BookModule,
     AuthorModule,
+    GenreModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -19,7 +19,7 @@ export class AuthService {
       });
     } catch (e) {
       // TODO: Handle error
-      throw new Error('Email already exists');
+      console.log(e.message);
     }
   }
 

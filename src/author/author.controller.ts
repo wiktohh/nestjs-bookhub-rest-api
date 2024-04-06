@@ -18,6 +18,7 @@ export class AuthorController {
 
   @Get()
   async getAuthors() {
+    //throw new Error('Not implemented');
     return await this.authorService.getAuthors();
   }
 

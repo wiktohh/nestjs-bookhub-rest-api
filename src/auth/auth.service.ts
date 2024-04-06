@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignInDto, SignUpDto } from './dto';
 import * as bcrypt from 'bcrypt';
+import { InvalidCredentialsException } from 'src/exceptions/invalid-credentials.exception';
 
 @Injectable()
 export class AuthService {
@@ -19,9 +20,8 @@ export class AuthService {
           hashedPassword,
         },
       });
-    } catch (e) {
-      // TODO: Handle error
-      console.log(e.message);
+    } catch (error) {
+      throw new InternalServerErrorException();
     }
   }
 
@@ -33,18 +33,18 @@ export class AuthService {
         },
       });
       if (!user) {
-        throw new Error('Invalid credentials');
+        throw new InvalidCredentialsException();
       }
       const isValidPassword = await bcrypt.compare(
         dto.password,
         user.hashedPassword,
       );
       if (!isValidPassword) {
-        throw new Error('Invalid credentials');
+        throw new InvalidCredentialsException();
       }
       return user;
     } catch (e) {
-      throw new Error('Invalid credentials');
+      throw new InternalServerErrorException();
     }
   }
 }

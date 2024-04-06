@@ -13,6 +13,8 @@ import { AuthorService } from './author.service';
 import { AddAuthorDto } from './dto';
 import { EditAuthorDto } from './dto/edit-author.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RoleGuard } from 'src/auth/guard/role.guard';
+import { Role } from 'src/auth/decorator/role.decorator';
 
 @Controller('authors')
 export class AuthorController {
@@ -29,7 +31,8 @@ export class AuthorController {
     return await this.authorService.getAuthor(id);
   }
 
-  @UseGuards(JwtGuard)
+  @Role('admin')
+  @UseGuards(JwtGuard, RoleGuard)
   @Post()
   async addAuthor(@Body() dto: AddAuthorDto) {
     return await this.authorService.addAuthor(dto);

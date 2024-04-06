@@ -7,10 +7,12 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthorService } from './author.service';
 import { AddAuthorDto } from './dto';
 import { EditAuthorDto } from './dto/edit-author.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
 @Controller('authors')
 export class AuthorController {
@@ -27,6 +29,7 @@ export class AuthorController {
     return await this.authorService.getAuthor(id);
   }
 
+  @UseGuards(JwtGuard)
   @Post()
   async addAuthor(@Body() dto: AddAuthorDto) {
     return await this.authorService.addAuthor(dto);

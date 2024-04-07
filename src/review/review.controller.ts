@@ -7,11 +7,17 @@ import {
   Param,
   ParseIntPipe,
   Body,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { AddReviewDto } from './dto/add-review.dto';
 import { EditReviewDto } from './dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { Request } from 'express';
+import { JWTPayloadInterface } from 'src/auth/auth.service';
 
+@UseGuards(JwtGuard)
 @Controller('/books/:bookId/reviews')
 export class ReviewController {
   constructor(private reviewService: ReviewService) {}
@@ -29,24 +35,28 @@ export class ReviewController {
   }
   @Post()
   async addReview(
+    @Req() req: Request & { user: JWTPayloadInterface },
     @Param('bookId', ParseIntPipe) bookId: number,
     @Body() body: AddReviewDto,
   ) {
-    return await this.reviewService.addReview(bookId, body);
+    return await this.reviewService.addReview(req.user, bookId, body);
   }
-  @Patch('/:id')
   async updateReview(
+    @Req() req: Request & { user: JWTPayloadInterface },
     @Param('bookId', ParseIntPipe) bookId: number,
     @Param('id', ParseIntPipe) id: number,
     @Body() body: EditReviewDto,
   ) {
-    return await this.reviewService.updateReview(bookId, id, body);
+    const userId = req.user;
+    return await this.reviewService.updateReview(req.user, bookId, id, body);
   }
   @Delete('/:id')
   async deleteReview(
+    @Req() req: Request & { user: JWTPayloadInterface },
     @Param('bookId', ParseIntPipe) bookId: number,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return await this.reviewService.deleteReview(bookId, id);
+    console.log(req.user);
+    return await this.reviewService.deleteReview(req.user, bookId, id);
   }
 }

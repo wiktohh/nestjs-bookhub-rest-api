@@ -7,8 +7,15 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { NotFoundException } from 'src/exceptions/not-found.exceptions';
 
+export interface JWTPayloadInterface {
+  id: number;
+  role: string;
+  iat: number;
+  exp: number;
+}
+
 export interface PayloadInterface {
-  sub: number;
+  id: number;
   role: string;
 }
 
@@ -67,7 +74,7 @@ export class AuthService {
       if (!isValidPassword) {
         throw new InvalidCredentialsException();
       }
-      return this.getTokens({ sub: user.id, role: user.role });
+      return this.getTokens({ id: user.id, role: user.role });
     } catch (e) {
       throw new InternalServerErrorException();
     }
@@ -103,7 +110,7 @@ export class AuthService {
       if (!user) {
         throw new NotFoundException();
       }
-      return this.getTokens({ sub: user.id, role: user.role });
+      return this.getTokens({ id: user.id, role: user.role });
     } catch (error) {
       throw new InvalidCredentialsException();
     }

@@ -1,11 +1,14 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AddReviewDto, EditReviewDto } from './dto';
 import {
+  ForbiddenException,
   Inject,
   Injectable,
   InternalServerErrorException,
+  UseGuards,
 } from '@nestjs/common';
 import { NotFoundException } from 'src/exceptions/not-found.exceptions';
+import { JWTPayloadInterface } from 'src/auth/auth.service';
 
 @Injectable()
 export class ReviewService {
@@ -31,7 +34,11 @@ export class ReviewService {
     }
     return review;
   }
-  async addReview(bookId: number, dto: AddReviewDto) {
+  async addReview(
+    user: JWTPayloadInterface,
+    bookId: number,
+    dto: AddReviewDto,
+  ) {
     const book = await this.prisma.book.findUnique({
       where: {
         id: bookId,
@@ -45,6 +52,7 @@ export class ReviewService {
     try {
       return await this.prisma.review.create({
         data: {
+          authorId: user.id,
           rating: dto.rating,
           comment: dto.comment,
           bookId,
@@ -54,16 +62,26 @@ export class ReviewService {
       throw new InternalServerErrorException();
     }
   }
-  async updateReview(bookId: number, id: number, dto: EditReviewDto) {
+
+  async updateReview(
+    user: JWTPayloadInterface,
+    bookId: number,
+    id: number,
+    dto: EditReviewDto,
+  ) {
     const book = await this.prisma.book.findUnique({
       where: {
         id: bookId,
       },
     });
+
     if (!book) {
       throw new NotFoundException(
         'There is no such a book in the database for which you want to update a review',
       );
+    }
+    if (user.id !== book.authorId) {
+      throw new ForbiddenException('You are not allowed to update this review');
     }
     try {
       const review = await this.prisma.review.findUnique({
@@ -89,7 +107,23 @@ export class ReviewService {
       throw new InternalServerErrorException();
     }
   }
-  async deleteReview(bookId: number, id: number) {
+  async deleteReview(user: JWTPayloadInterface, bookId: number, id: number) {
+    const book = await this.prisma.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (!book) {
+      throw new ForbiddenException(
+        'There is no such a book in the database for which you want to delete a review',
+      );
+    }
+
+    if (user.id !== book.authorId) {
+      throw new NotFoundException('You are not allowed to delete this review');
+    }
+
     const review = await this.prisma.review.findUnique({
       where: {
         id: bookId,

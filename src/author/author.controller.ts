@@ -38,6 +38,8 @@ export class AuthorController {
     return await this.authorService.addAuthor(dto);
   }
 
+  @Role('admin')
+  @UseGuards(JwtGuard, RoleGuard)
   @Patch(':id')
   async updateAuthor(
     @Param('id', ParseIntPipe) id: number,
@@ -46,6 +48,8 @@ export class AuthorController {
     return await this.authorService.updateAuthor(id, dto);
   }
 
+  @Role('admin')
+  @UseGuards(JwtGuard, RoleGuard)
   @Delete(':id')
   async deleteAuthor(@Param('id', ParseIntPipe) id: number) {
     return await this.authorService.deleteAuthor(id);

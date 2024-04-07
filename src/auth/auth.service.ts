@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { NotFoundException } from 'src/exceptions/not-found.exceptions';
 
 export interface PayloadInterface {
-  sub: string;
+  sub: number;
   role: string;
 }
 
@@ -67,7 +67,7 @@ export class AuthService {
       if (!isValidPassword) {
         throw new InvalidCredentialsException();
       }
-      return this.getTokens({ sub: user.email, role: user.role });
+      return this.getTokens({ sub: user.id, role: user.role });
     } catch (e) {
       throw new InternalServerErrorException();
     }
@@ -103,7 +103,7 @@ export class AuthService {
       if (!user) {
         throw new NotFoundException();
       }
-      return this.getTokens({ sub: user.email, role: user.role });
+      return this.getTokens({ sub: user.id, role: user.role });
     } catch (error) {
       throw new InvalidCredentialsException();
     }

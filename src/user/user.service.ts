@@ -13,7 +13,7 @@ export class UserService {
       },
     });
     if (!user) {
-      throw new NotFoundException();
+      throw new NotFoundException('Could not find a user with the provided id');
     }
     return user;
   }

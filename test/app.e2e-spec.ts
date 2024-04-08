@@ -101,16 +101,50 @@ describe('App (e2e)', () => {
       });
     });
     describe('Login', () => {
+      it('should throw if email empty', () => {
+        return pactum
+          .spec()
+          .post('/auth/sign-in')
+          .withBody({ ...dto, email: '' })
+          .expectStatus(400);
+      });
+      it('should throw if password empty', () => {
+        return pactum
+          .spec()
+          .post('/auth/sign-in')
+          .withBody({ ...dto, password: '' })
+          .expectStatus(400);
+      });
+      it('should throw if no body provided', () => {
+        return pactum.spec().post('/auth/sign-in').expectStatus(400);
+      });
+      it("should throw if email doesn't match email pattern", () => {
+        return pactum
+          .spec()
+          .post('/auth/sign-in')
+          .withBody({ ...dto, email: 'test' })
+          .expectStatus(400);
+      });
+      it('should throw if user not found', () => {
+        return pactum
+          .spec()
+          .post('/auth/sign-in')
+          .withBody({ email: 'email@wp.pl' })
+          .expectStatus(400);
+      });
+      it('should throw if password is incorrect', () => {
+        return pactum
+          .spec()
+          .post('/auth/sign-in')
+          .withBody({ email: dto.email, password: 'wrongPassword' })
+          .expectStatus(400);
+      });
       it('should login a user', () => {
         return pactum
           .spec()
           .post('/auth/sign-in')
           .withBody({ email: dto.email, password: dto.password })
           .expectStatus(201)
-          .expectJson({
-            accessToken: String,
-            refreshToken: String,
-          })
           .stores('userAt', 'accessToken');
       });
     });

@@ -579,5 +579,204 @@ describe('App (e2e)', () => {
     });
   });
 
-  describe('Reviews', () => {});
+  describe('Reviews', () => {
+    beforeAll(async () => {
+      await pactum
+        .spec()
+        .post('/books')
+        .withHeaders({
+          Authorization: `Bearer $S{adminToken}`,
+        })
+        .withBody({
+          title: 'Harry Potter',
+          author: 'Jan Kowalski',
+        });
+    });
+    describe('POST /books/:bookId/reviews', () => {
+      it('should throw if no token provided', () => {
+        return pactum
+          .spec()
+          .post('/books/1/reviews')
+          .withBody({
+            rating: 5,
+            comment: 'Great book!',
+          })
+          .expectStatus(401);
+      });
+      it('should throw if no body provided', () => {
+        return pactum
+          .spec()
+          .post('/books/1/reviews')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .expectStatus(400);
+      });
+      it('should throw if rating is not a number', () => {
+        return pactum
+          .spec()
+          .post('/books/1/reviews')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .withBody({
+            rating: 'XD',
+            comment: 'Great book!',
+          })
+          .expectStatus(400);
+      });
+      it('should throw if rating is not between 1 and 5', () => {
+        return pactum
+          .spec()
+          .post('/books/1/reviews')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .withBody({
+            rating: 6,
+            comment: 'Great book!',
+          })
+          .expectStatus(400);
+      });
+      it('should add review', () => {
+        return pactum
+          .spec()
+          .post('/books/1/reviews')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .withBody({
+            rating: 5,
+            comment: 'Great book!',
+          })
+          .expectStatus(201);
+      });
+    });
+    describe('GET /books/:bookId/reviews', () => {
+      it("should throw if book doesn't exists", () => {
+        return pactum.spec().get('/books/999/reviews').expectStatus(404);
+      });
+      it('should return reviews', () => {
+        return pactum.spec().get('/books/1/reviews').expectStatus(200);
+      });
+    });
+    describe('GET /books/:bookId/reviews/:id', () => {
+      it('should return review', () => {
+        return pactum.spec().get('/books/1/reviews/1').expectStatus(200);
+      });
+      it('should throw if book not found', () => {
+        return pactum.spec().get('/books/999/reviews/1').expectStatus(404);
+      });
+      it('should throw if review not found', () => {
+        return pactum.spec().get('/books/1/reviews/999').expectStatus(404);
+      });
+    });
+    describe('PATCH /books/:bookId/reviews/:id', () => {
+      it('should throw if no token provided', () => {
+        return pactum.spec().patch('/books/1/reviews/1').expectStatus(401);
+      });
+      it('should throw if no body provided', () => {
+        return pactum
+          .spec()
+          .patch('/books/1/reviews/1')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .expectStatus(401);
+      });
+      it('should throw if user try to update not his review', () => {
+        return pactum
+          .spec()
+          .patch('/books/1/reviews/1')
+          .withHeaders({
+            Authorization: `Bearer $S{userToken}`,
+          })
+          .withBody({
+            rating: 5,
+            comment: 'Great book!',
+          })
+          .expectStatus(403);
+      });
+      it('should update review', () => {
+        return pactum
+          .spec()
+          .patch('/books/1/reviews/1')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .withBody({
+            rating: 4,
+            comment: 'Great book!',
+          })
+          .expectStatus(200);
+      });
+      it('should throw if review not found', () => {
+        return pactum
+          .spec()
+          .patch('/books/1/reviews/999')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .withBody({
+            rating: 4,
+            comment: 'Great book!',
+          })
+          .expectStatus(404);
+      });
+      it('should throw if book not found', () => {
+        return pactum
+          .spec()
+          .patch('/books/999/reviews/1')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .withBody({
+            rating: 4,
+            comment: 'Great book!',
+          })
+          .expectStatus(404);
+      });
+    });
+    describe('DELETE /books/:bookId/reviews/:id', () => {
+      it("should throw if book doesn't exists", () => {
+        return pactum
+          .spec()
+          .delete('/books/999/reviews/1')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .expectStatus(404);
+      });
+      it('should throw if review not found', () => {
+        return pactum
+          .spec()
+          .delete('/books/1/reviews/999')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .expectStatus(404);
+      });
+      it('should throw if no token provided', () => {
+        return pactum.spec().delete('/books/1/reviews/1').expectStatus(401);
+      });
+      it('should throw if user try to delete not his review', () => {
+        return pactum
+          .spec()
+          .delete('/books/1/reviews/1')
+          .withHeaders({
+            Authorization: `Bearer $S{userToken}`,
+          })
+          .expectStatus(403);
+      });
+      it('should delete review', () => {
+        return pactum
+          .spec()
+          .delete('/books/1/reviews/1')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .expectStatus(200);
+      });
+    });
+  });
 });

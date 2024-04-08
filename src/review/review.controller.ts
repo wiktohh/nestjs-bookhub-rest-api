@@ -17,7 +17,6 @@ import { JwtGuard } from '../auth/guard/jwt.guard';
 import { Request } from 'express';
 import { JWTPayloadInterface } from '../auth/auth.service';
 
-@UseGuards(JwtGuard)
 @Controller('/books/:bookId/reviews')
 export class ReviewController {
   constructor(private reviewService: ReviewService) {}
@@ -33,6 +32,7 @@ export class ReviewController {
   ) {
     return await this.reviewService.getReview(bookId, id);
   }
+  @UseGuards(JwtGuard)
   @Post()
   async addReview(
     @Req() req: Request & { user: JWTPayloadInterface },
@@ -41,6 +41,8 @@ export class ReviewController {
   ) {
     return await this.reviewService.addReview(req.user, bookId, body);
   }
+  @UseGuards(JwtGuard)
+  @Patch('/:id')
   async updateReview(
     @Req() req: Request & { user: JWTPayloadInterface },
     @Param('bookId', ParseIntPipe) bookId: number,
@@ -50,6 +52,7 @@ export class ReviewController {
     const userId = req.user;
     return await this.reviewService.updateReview(req.user, bookId, id, body);
   }
+  @UseGuards(JwtGuard)
   @Delete('/:id')
   async deleteReview(
     @Req() req: Request & { user: JWTPayloadInterface },

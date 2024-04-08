@@ -2,10 +2,10 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignInDto, SignUpDto } from './dto';
 import * as bcrypt from 'bcrypt';
-import { InvalidCredentialsException } from 'src/exceptions/invalid-credentials.exception';
+import { InvalidCredentialsException } from '../exceptions/invalid-credentials.exception';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { NotFoundException } from 'src/exceptions/not-found.exceptions';
+import { NotFoundException } from '../exceptions/not-found.exceptions';
 
 export interface JWTPayloadInterface {
   id: number;

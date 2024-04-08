@@ -11,9 +11,9 @@ import {
 } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { AddGenreDto, EditGenreDto } from './dto';
-import { Role } from 'src/auth/decorator/role.decorator';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { RoleGuard } from 'src/auth/guard/role.guard';
+import { Role } from '../auth/decorator/role.decorator';
+import { JwtGuard } from '../auth/guard/jwt.guard';
+import { RoleGuard } from '../auth/guard/role.guard';
 
 @Controller('genres')
 export class GenreController {

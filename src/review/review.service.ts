@@ -1,4 +1,4 @@
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { AddReviewDto, EditReviewDto } from './dto';
 import {
   ForbiddenException,
@@ -7,8 +7,8 @@ import {
   InternalServerErrorException,
   UseGuards,
 } from '@nestjs/common';
-import { NotFoundException } from 'src/exceptions/not-found.exceptions';
-import { JWTPayloadInterface } from 'src/auth/auth.service';
+import { NotFoundException } from '../exceptions/not-found.exceptions';
+import { JWTPayloadInterface } from '../auth/auth.service';
 
 @Injectable()
 export class ReviewService {

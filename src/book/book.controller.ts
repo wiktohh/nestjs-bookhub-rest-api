@@ -12,9 +12,9 @@ import {
 import { BookService } from './book.service';
 import { AddBookDto } from './dto';
 import { EditBookDto } from './dto/edit-book.dto';
-import { RoleGuard } from 'src/auth/guard/role.guard';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { Role } from 'src/auth/decorator/role.decorator';
+import { RoleGuard } from '../auth/guard/role.guard';
+import { JwtGuard } from '../auth/guard/jwt.guard';
+import { Role } from '../auth/decorator/role.decorator';
 
 @Controller('/books')
 export class BookController {

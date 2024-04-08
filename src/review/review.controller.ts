@@ -13,9 +13,9 @@ import {
 import { ReviewService } from './review.service';
 import { AddReviewDto } from './dto/add-review.dto';
 import { EditReviewDto } from './dto';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { JwtGuard } from '../auth/guard/jwt.guard';
 import { Request } from 'express';
-import { JWTPayloadInterface } from 'src/auth/auth.service';
+import { JWTPayloadInterface } from '../auth/auth.service';
 
 @UseGuards(JwtGuard)
 @Controller('/books/:bookId/reviews')

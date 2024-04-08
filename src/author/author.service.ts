@@ -1,9 +1,9 @@
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { AddAuthorDto } from './dto';
 import { Injectable, UseGuards } from '@nestjs/common';
 import { EditAuthorDto } from './dto/edit-author.dto';
-import { NotFoundException } from 'src/exceptions/not-found.exceptions';
-import { InternalServerErrorException } from 'src/exceptions/internal-server-error.exception';
+import { NotFoundException } from '../exceptions/not-found.exceptions';
+import { InternalServerErrorException } from '../exceptions/internal-server-error.exception';
 @Injectable()
 export class AuthorService {
   constructor(private prisma: PrismaService) {}

@@ -12,9 +12,9 @@ import {
 import { AuthorService } from './author.service';
 import { AddAuthorDto } from './dto';
 import { EditAuthorDto } from './dto/edit-author.dto';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { RoleGuard } from 'src/auth/guard/role.guard';
-import { Role } from 'src/auth/decorator/role.decorator';
+import { JwtGuard } from '../auth/guard/jwt.guard';
+import { RoleGuard } from '../auth/guard/role.guard';
+import { Role } from '../auth/decorator/role.decorator';
 
 @Controller('authors')
 export class AuthorController {

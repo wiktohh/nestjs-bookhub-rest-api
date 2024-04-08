@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddBookDto } from './dto';
 import { EditBookDto } from './dto/edit-book.dto';
-import { NotFoundException } from 'src/exceptions/not-found.exceptions';
-import { InternalServerErrorException } from 'src/exceptions/internal-server-error.exception';
+import { NotFoundException } from '../exceptions/not-found.exceptions';
+import { InternalServerErrorException } from '../exceptions/internal-server-error.exception';
 
 @Injectable()
 export class BookService {

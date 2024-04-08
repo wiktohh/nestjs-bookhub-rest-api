@@ -41,17 +41,17 @@ export class AuthorService {
   }
 
   async updateAuthor(id: number, dto: EditAuthorDto) {
+    const author = await this.prisma.author.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!author) {
+      throw new NotFoundException(
+        'Could not find an author with the provided id',
+      );
+    }
     try {
-      const author = await this.prisma.author.findUnique({
-        where: {
-          id,
-        },
-      });
-      if (!author) {
-        throw new NotFoundException(
-          'Could not find an author with the provided id',
-        );
-      }
       return await this.prisma.author.update({
         where: {
           id,

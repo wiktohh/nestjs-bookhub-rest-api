@@ -1,7 +1,7 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsNotEmpty } from 'class-validator';
 
 export class EditAuthorDto {
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   name: string;
 }

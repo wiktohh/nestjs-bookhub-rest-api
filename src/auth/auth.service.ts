@@ -33,21 +33,21 @@ export class AuthService {
   ) {}
 
   async signUp(dto: SignUpDto) {
+    const existingUser = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+    if (existingUser) {
+      throw new InvalidCredentialsException('User already exists');
+    }
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    // if (!dto.role) {
+    //   dto.role = 'USER';
+    // }
+
     try {
-      const existingUser = await this.prisma.user.findUnique({
-        where: {
-          email: dto.email,
-        },
-      });
-      if (existingUser) {
-        throw new InvalidCredentialsException('User already exists');
-      }
-      const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-      // if (!dto.role) {
-      //   dto.role = 'USER';
-      // }
-
       await this.prisma.user.create({
         data: {
           firstName: dto.firstName,
@@ -63,22 +63,22 @@ export class AuthService {
   }
 
   async signIn(dto: SignInDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+    if (!user) {
+      throw new InvalidCredentialsException();
+    }
+    const isValidPassword = await bcrypt.compare(
+      dto.password,
+      user.hashedPassword,
+    );
+    if (!isValidPassword) {
+      throw new InvalidCredentialsException();
+    }
     try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          email: dto.email,
-        },
-      });
-      if (!user) {
-        throw new InvalidCredentialsException();
-      }
-      const isValidPassword = await bcrypt.compare(
-        dto.password,
-        user.hashedPassword,
-      );
-      if (!isValidPassword) {
-        throw new InvalidCredentialsException();
-      }
       return this.getTokens({ id: user.id, role: user.role });
     } catch (e) {
       throw new InternalServerErrorException();

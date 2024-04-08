@@ -36,15 +36,15 @@ export class GenreService {
   }
 
   async updateGenre(id: number, dto: AddGenreDto) {
+    const genre = await this.prisma.genre.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!genre) {
+      throw new NotFoundException('There is no genre with the provided id.');
+    }
     try {
-      const genre = await this.prisma.genre.findUnique({
-        where: {
-          id,
-        },
-      });
-      if (!genre) {
-        throw new NotFoundException('There is no genre with the provided id.');
-      }
       return await this.prisma.genre.update({
         where: {
           id,

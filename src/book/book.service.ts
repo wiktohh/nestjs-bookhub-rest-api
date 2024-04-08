@@ -4,6 +4,7 @@ import { AddBookDto } from './dto';
 import { EditBookDto } from './dto/edit-book.dto';
 import { NotFoundException } from '../exceptions/not-found.exceptions';
 import { InternalServerErrorException } from '../exceptions/internal-server-error.exception';
+import { InvalidCredentialsException } from '../exceptions/invalid-credentials.exception';
 
 @Injectable()
 export class BookService {
@@ -30,17 +31,17 @@ export class BookService {
   }
 
   async addBook(dto: AddBookDto) {
+    const author = await this.prisma.author.findFirst({
+      where: {
+        name: dto.author,
+      },
+    });
+    if (!author) {
+      throw new NotFoundException(
+        'There is no such an author in the database for whom you want to assign a book.',
+      );
+    }
     try {
-      const author = await this.prisma.author.findFirst({
-        where: {
-          name: dto.author,
-        },
-      });
-      if (!author) {
-        throw new NotFoundException(
-          'There is no such an author in the database for whom you want to assign a book.',
-        );
-      }
       return await this.prisma.book.create({
         data: {
           title: dto.title,
@@ -53,34 +54,39 @@ export class BookService {
   }
 
   async updateBook(id: number, dto: EditBookDto) {
-    try {
-      const book = await this.prisma.book.findUnique({
+    const book = await this.prisma.book.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!book) {
+      throw new NotFoundException(
+        'Could not find a book with the provided id.',
+      );
+    }
+
+    if (!dto.title && !dto.author) {
+      throw new InvalidCredentialsException(
+        'You should provide at least one field to update.',
+      );
+    }
+
+    let authorId;
+
+    if (dto.author) {
+      const author = await this.prisma.author.findFirst({
         where: {
-          id,
+          name: dto.author,
         },
       });
-      if (!book) {
+      if (!author) {
         throw new NotFoundException(
-          'Could not find a book with the provided id.',
+          'There is no such an author in the database for whom you want to update a book.',
         );
       }
-
-      let authorId;
-
-      if (dto.author) {
-        const author = await this.prisma.author.findFirst({
-          where: {
-            name: dto.author,
-          },
-        });
-        if (!author) {
-          throw new NotFoundException(
-            'There is no such an author in the database for whom you want to update a book.',
-          );
-        }
-        authorId = author.id;
-      }
-
+      authorId = author.id;
+    }
+    try {
       return await this.prisma.book.update({
         where: {
           id,

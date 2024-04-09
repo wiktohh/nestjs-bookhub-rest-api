@@ -24,7 +24,7 @@ model User {
 
 model Author {
   id        Int   @id @default(autoincrement())
-  name      String
+  name      String @unique
   books     Book[]
   review    Review[]
   createdAt DateTime @default(now())
@@ -32,7 +32,7 @@ model Author {
 
 model Book {
   id        Int   @id @default(autoincrement())
-  title     String
+  title     String @unique
   createdAt DateTime @default(now())
   authorId    Int
   author      Author  @relation(fields: [authorId], references: [id])
@@ -42,7 +42,7 @@ model Book {
 
 model Genre {
   id       Int   @id @default(autoincrement())
-  name      String
+  name      String @unique
 }
 
 model Review {

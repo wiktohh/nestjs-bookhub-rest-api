@@ -111,7 +111,7 @@ describe('AuthService', () => {
       };
       (prismaService.user.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(authService.signIn(signInDto)).rejects.toThrowError(
+      await expect(authService.signIn(signInDto)).rejects.toThrow(
         InvalidCredentialsException,
       );
     });
@@ -130,7 +130,7 @@ describe('AuthService', () => {
       (prismaService.user.findUnique as jest.Mock).mockResolvedValue(user);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(authService.signIn(signInDto)).rejects.toThrowError(
+      await expect(authService.signIn(signInDto)).rejects.toThrow(
         InvalidCredentialsException,
       );
     });
@@ -158,7 +158,7 @@ describe('AuthService', () => {
       });
       (prismaService.user.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(authService.refreshToken(token)).rejects.toThrowError(
+      await expect(authService.refreshToken(token)).rejects.toThrow(
         InvalidCredentialsException,
       );
     });
@@ -169,7 +169,7 @@ describe('AuthService', () => {
         new Error('Invalid token'),
       );
 
-      await expect(authService.refreshToken(token)).rejects.toThrowError(
+      await expect(authService.refreshToken(token)).rejects.toThrow(
         InvalidCredentialsException,
       );
     });

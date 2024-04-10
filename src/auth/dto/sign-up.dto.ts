@@ -24,7 +24,7 @@ export class SignUpDto {
   @MinLength(6)
   password: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   role: Role;
 }

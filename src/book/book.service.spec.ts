@@ -21,6 +21,9 @@ describe('BookService', () => {
     author: {
       findFirst: jest.fn().mockResolvedValue({}),
     },
+    genre: {
+      findFirst: jest.fn().mockResolvedValue({}),
+    },
   };
 
   beforeEach(async () => {
@@ -81,10 +84,10 @@ describe('BookService', () => {
 
   describe('addBook', () => {
     it('should add new book', async () => {
-      const newBookDto = { title: 'New Book', author: 'John Doe' };
+      const newBookDto = { title: 'New Book', authorId: 1, genreId: 1 };
       const author = { id: 1 };
       (prismaService.author.findFirst as jest.Mock).mockResolvedValue(author);
-      const createdBook = { id: 1, title: 'New Book', author: 'Jan' };
+      const createdBook = { id: 1, title: 'New Book', authorId: 1, genreId: 1 };
       (prismaService.book.create as jest.Mock).mockResolvedValue(createdBook);
 
       const result = await bookService.addBook(newBookDto);
@@ -93,9 +96,20 @@ describe('BookService', () => {
     });
 
     it('should throw NotFoundException when author does not exist', async () => {
-      const newBookDto = { title: 'New Book', author: 'Non-existing Author' };
+      const newBookDto = { title: 'New Book', authorId: 999, genreId: 1 };
       (prismaService.author.findFirst as jest.Mock).mockResolvedValue(null);
+      (prismaService.genre.findFirst as jest.Mock).mockResolvedValue({ id: 1 });
 
+      await expect(bookService.addBook(newBookDto)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+    it('should throw NotFoundException when genre does not exist', async () => {
+      const newBookDto = { title: 'New Book', authorId: 1, genreId: 999 };
+      (prismaService.author.findFirst as jest.Mock).mockResolvedValue({
+        id: 1,
+      });
+      (prismaService.genre.findFirst as jest.Mock).mockResolvedValue(null);
       await expect(bookService.addBook(newBookDto)).rejects.toThrow(
         NotFoundException,
       );
@@ -105,17 +119,25 @@ describe('BookService', () => {
   describe('updateBook', () => {
     it('should update existing book', async () => {
       const bookId = 1;
-      const updatedBookDto = { title: 'Updated Book', author: 'John Doe' };
+      const updatedBookDto = {
+        title: 'Updated Book',
+        authorId: 2,
+        genreId: 1,
+      };
       const existingBook = {
         id: bookId,
         title: 'Original Book',
-        author: 'Jan',
+        authorId: 1,
+        genreId: 1,
       };
       (prismaService.book.findUnique as jest.Mock).mockResolvedValue(
         existingBook,
       );
       const author = { id: 2 };
       (prismaService.author.findFirst as jest.Mock).mockResolvedValue(author);
+      (prismaService.genre.findFirst as jest.Mock).mockResolvedValue({
+        id: 1,
+      });
       const updatedBook = { ...existingBook, ...updatedBookDto, authorId: 2 };
       (prismaService.book.update as jest.Mock).mockResolvedValue(updatedBook);
 
@@ -126,7 +148,11 @@ describe('BookService', () => {
 
     it('should throw NotFoundException when given non-existing id', async () => {
       const nonExistingId = 999;
-      const updatedBookDto = { title: 'Updated Book', author: 'John Doe' };
+      const updatedBookDto = {
+        title: 'Updated Book',
+        authorId: 1,
+        genreId: 1,
+      };
       (prismaService.book.findUnique as jest.Mock).mockResolvedValue(null);
       await expect(
         bookService.updateBook(nonExistingId, updatedBookDto),
@@ -137,18 +163,44 @@ describe('BookService', () => {
       const bookId = 1;
       const updatedBookDto = {
         title: 'Updated Book',
-        author: 'Non-existing Author',
+        authorId: 5,
+        genreId: 1,
       };
       const existingBook = {
         id: bookId,
         title: 'Original Book',
-        author: 'Jan',
+        authorId: 1,
+        genreId: 1,
       };
       (prismaService.book.findUnique as jest.Mock).mockResolvedValue(
         existingBook,
       );
       (prismaService.author.findFirst as jest.Mock).mockResolvedValue(null);
 
+      await expect(
+        bookService.updateBook(bookId, updatedBookDto),
+      ).rejects.toThrow(NotFoundException);
+    });
+    it('should throw NotFoundException when genre does not exist', async () => {
+      const bookId = 1;
+      const updatedBookDto = {
+        title: 'Updated Book',
+        authorId: 1,
+        genreId: 5,
+      };
+      const existingBook = {
+        id: bookId,
+        title: 'Original Book',
+        authorId: 1,
+        genreId: 1,
+      };
+      (prismaService.book.findUnique as jest.Mock).mockResolvedValue(
+        existingBook,
+      );
+      (prismaService.author.findFirst as jest.Mock).mockResolvedValue({
+        id: 1,
+      });
+      (prismaService.genre.findFirst as jest.Mock).mockResolvedValue(null);
       await expect(
         bookService.updateBook(bookId, updatedBookDto),
       ).rejects.toThrow(NotFoundException);

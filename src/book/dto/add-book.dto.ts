@@ -1,11 +1,15 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class AddBookDto {
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  author: string;
+  authorId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  genreId: number;
 }

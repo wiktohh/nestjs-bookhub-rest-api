@@ -33,7 +33,7 @@ export class BookService {
   async addBook(dto: AddBookDto) {
     const author = await this.prisma.author.findFirst({
       where: {
-        name: dto.author,
+        id: dto.authorId,
       },
     });
     if (!author) {
@@ -41,11 +41,23 @@ export class BookService {
         'There is no such an author in the database for whom you want to assign a book.',
       );
     }
+    const genre = await this.prisma.genre.findFirst({
+      where: {
+        id: dto.genreId,
+      },
+    });
+    if (!genre) {
+      throw new NotFoundException(
+        'There is no such a genre in the database for which you want to assign a book.',
+      );
+    }
+
     try {
       return await this.prisma.book.create({
         data: {
           title: dto.title,
-          authorId: author.id,
+          authorId: dto.authorId,
+          genreId: dto.genreId,
         },
       });
     } catch (error) {
@@ -64,8 +76,18 @@ export class BookService {
         'Could not find a book with the provided id.',
       );
     }
+    const genre = await this.prisma.genre.findFirst({
+      where: {
+        id: dto.genreId,
+      },
+    });
+    if (!genre) {
+      throw new NotFoundException(
+        'There is no such a genre in the database for which you want to update a book.',
+      );
+    }
 
-    if (!dto.title && !dto.author) {
+    if (!dto.title && !dto.authorId) {
       throw new InvalidCredentialsException(
         'You should provide at least one field to update.',
       );
@@ -73,10 +95,10 @@ export class BookService {
 
     let authorId;
 
-    if (dto.author) {
+    if (dto.authorId) {
       const author = await this.prisma.author.findFirst({
         where: {
-          name: dto.author,
+          id: dto.authorId,
         },
       });
       if (!author) {

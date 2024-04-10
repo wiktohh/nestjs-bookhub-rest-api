@@ -36,6 +36,8 @@ model Book {
   createdAt DateTime @default(now())
   authorId    Int
   author      Author  @relation(fields: [authorId], references: [id])
+  genreId     Int
+  genre       Genre   @relation(fields: [genreId], references: [id])
   reviews     Review[]
   }
 
@@ -43,6 +45,7 @@ model Book {
 model Genre {
   id       Int   @id @default(autoincrement())
   name      String @unique
+  books     Book[]
 }
 
 model Review {

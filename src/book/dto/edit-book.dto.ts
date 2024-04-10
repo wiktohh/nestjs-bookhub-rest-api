@@ -1,11 +1,15 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class EditBookDto {
   @IsString()
   @IsOptional()
   title: string;
 
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  author: string;
+  authorId: number;
+
+  @IsNumber()
+  @IsOptional()
+  genreId: number;
 }

@@ -15,7 +15,9 @@ import { EditAuthorDto } from './dto/edit-author.dto';
 import { JwtGuard } from '../auth/guard/jwt.guard';
 import { RoleGuard } from '../auth/guard/role.guard';
 import { Role } from '../auth/decorator/role.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Authors')
 @Controller('authors')
 export class AuthorController {
   constructor(private authorService: AuthorService) {}
@@ -33,6 +35,7 @@ export class AuthorController {
 
   @Role('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
   @Post()
   async addAuthor(@Body() dto: AddAuthorDto) {
     return await this.authorService.addAuthor(dto);
@@ -40,6 +43,7 @@ export class AuthorController {
 
   @Role('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
   @Patch(':id')
   async updateAuthor(
     @Param('id', ParseIntPipe) id: number,
@@ -50,6 +54,7 @@ export class AuthorController {
 
   @Role('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
   @Delete(':id')
   async deleteAuthor(@Param('id', ParseIntPipe) id: number) {
     return await this.authorService.deleteAuthor(id);

@@ -15,7 +15,9 @@ import { EditBookDto } from './dto/edit-book.dto';
 import { RoleGuard } from '../auth/guard/role.guard';
 import { JwtGuard } from '../auth/guard/jwt.guard';
 import { Role } from '../auth/decorator/role.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Books')
 @Controller('/books')
 export class BookController {
   constructor(private bookService: BookService) {}
@@ -32,6 +34,7 @@ export class BookController {
 
   @Role('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
   @Post()
   async addBook(@Body() body: AddBookDto) {
     return await this.bookService.addBook(body);
@@ -39,6 +42,7 @@ export class BookController {
 
   @Role('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
   @Patch('/:id')
   async updateBook(
     @Param('id', ParseIntPipe) id: number,
@@ -49,6 +53,7 @@ export class BookController {
 
   @Role('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
   @Delete('/:id')
   async deleteBook(@Param('id', ParseIntPipe) id: number) {
     return await this.bookService.deleteBook(id);

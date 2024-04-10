@@ -16,7 +16,9 @@ import { EditReviewDto } from './dto';
 import { JwtGuard } from '../auth/guard/jwt.guard';
 import { Request } from 'express';
 import { JWTPayloadInterface } from '../auth/auth.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Reviews')
 @Controller('/books/:bookId/reviews')
 export class ReviewController {
   constructor(private reviewService: ReviewService) {}
@@ -33,6 +35,7 @@ export class ReviewController {
     return await this.reviewService.getReview(bookId, id);
   }
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   @Post()
   async addReview(
     @Req() req: Request & { user: JWTPayloadInterface },
@@ -42,6 +45,7 @@ export class ReviewController {
     return await this.reviewService.addReview(req.user, bookId, body);
   }
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   @Patch('/:id')
   async updateReview(
     @Req() req: Request & { user: JWTPayloadInterface },
@@ -53,6 +57,7 @@ export class ReviewController {
     return await this.reviewService.updateReview(req.user, bookId, id, body);
   }
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   @Delete('/:id')
   async deleteReview(
     @Req() req: Request & { user: JWTPayloadInterface },

@@ -130,7 +130,7 @@ describe('BookService', () => {
       (prismaService.book.findUnique as jest.Mock).mockResolvedValue(null);
       await expect(
         bookService.updateBook(nonExistingId, updatedBookDto),
-      ).rejects.toThrowError(NotFoundException);
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw NotFoundException when author does not exist', async () => {
@@ -176,7 +176,7 @@ describe('BookService', () => {
     it('should throw NotFoundException when given non-existing id', async () => {
       const nonExistingId = 999;
       (prismaService.book.findUnique as jest.Mock).mockResolvedValue(null);
-      await expect(bookService.deleteBook(nonExistingId)).rejects.toThrowError(
+      await expect(bookService.deleteBook(nonExistingId)).rejects.toThrow(
         NotFoundException,
       );
     });

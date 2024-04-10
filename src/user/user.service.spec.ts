@@ -48,7 +48,7 @@ describe('UserService', () => {
       const nonExistingId = 999;
       (prismaService.user.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(userService.getUser(nonExistingId)).rejects.toThrowError(
+      await expect(userService.getUser(nonExistingId)).rejects.toThrow(
         NotFoundException,
       );
     });

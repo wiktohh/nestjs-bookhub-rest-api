@@ -76,6 +76,11 @@ export class BookService {
         'Could not find a book with the provided id.',
       );
     }
+    if (!dto.title && !dto.authorId) {
+      throw new InvalidCredentialsException(
+        'You should provide at least one field to update.',
+      );
+    }
     const genre = await this.prisma.genre.findFirst({
       where: {
         id: dto.genreId,
@@ -84,12 +89,6 @@ export class BookService {
     if (!genre) {
       throw new NotFoundException(
         'There is no such a genre in the database for which you want to update a book.',
-      );
-    }
-
-    if (!dto.title && !dto.authorId) {
-      throw new InvalidCredentialsException(
-        'You should provide at least one field to update.',
       );
     }
 

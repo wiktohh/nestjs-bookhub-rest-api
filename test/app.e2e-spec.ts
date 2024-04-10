@@ -441,8 +441,11 @@ describe('App (e2e)', () => {
   });
 
   describe('Books', () => {
+    let authorId: number;
+    let genreId: number;
+    let bookId: number;
     beforeAll(async () => {
-      await pactum
+      const authorResponse = await pactum
         .spec()
         .post('/authors')
         .withHeaders({
@@ -450,6 +453,17 @@ describe('App (e2e)', () => {
         })
         .withBody({ name: 'Jan Kowalski' })
         .expectStatus(201);
+      authorId = authorResponse.body.id;
+      const genreResponse = await pactum
+        .spec()
+        .post('/genres')
+        .withHeaders({
+          Authorization: `Bearer $S{adminToken}`,
+        })
+        .withBody({ name: 'Horror' })
+        .expectStatus(201)
+        .inspect();
+      genreId = genreResponse.body.id;
     });
     describe('POST /books', () => {
       it('should throw if no token provided', () => {
@@ -458,7 +472,8 @@ describe('App (e2e)', () => {
           .post('/books')
           .withBody({
             title: 'Harry Potter',
-            author: 'Jan Kowalski',
+            authorId,
+            genreId,
           })
           .expectStatus(401);
       });
@@ -480,7 +495,22 @@ describe('App (e2e)', () => {
           })
           .withBody({
             title: 'Harry Potter',
-            author: 'XDwadawdawdaw',
+            authorId: 999,
+            genreId,
+          })
+          .expectStatus(404);
+      });
+      it("should throw if genre doesn't exists", () => {
+        return pactum
+          .spec()
+          .post('/books')
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .withBody({
+            title: 'Harry Potter',
+            authorId,
+            genreId: 999,
           })
           .expectStatus(404);
       });
@@ -493,12 +523,13 @@ describe('App (e2e)', () => {
           })
           .withBody({
             title: 'Harry Potter',
-            author: 'Jan Kowalski',
+            authorId,
+            genreId,
           })
           .expectStatus(403);
       });
-      it('should add book', () => {
-        return pactum
+      it('should add book', async () => {
+        const bookResponse = await pactum
           .spec()
           .post('/books')
           .withHeaders({
@@ -506,9 +537,11 @@ describe('App (e2e)', () => {
           })
           .withBody({
             title: 'Harry Potter',
-            author: 'Jan Kowalski',
+            authorId,
+            genreId,
           })
           .expectStatus(201);
+        bookId = bookResponse.body.id;
       });
     });
     describe('GET /books', () => {
@@ -518,20 +551,20 @@ describe('App (e2e)', () => {
     });
     describe('GET /books/:id', () => {
       it('should return book', () => {
-        return pactum.spec().get('/books/1').expectStatus(200);
+        return pactum.spec().get(`/books/${bookId}`).expectStatus(200);
       });
       it('should throw if book not found', () => {
         return pactum.spec().get('/books/999').expectStatus(404);
       });
     });
-    describe('patch /books/:id', () => {
+    describe('PATCH /books/:id', () => {
       it('should throw if no token provided', () => {
-        return pactum.spec().patch('/books/1').expectStatus(401);
+        return pactum.spec().patch(`/books/${bookId}`).expectStatus(401);
       });
       it('should throw if no body provided', () => {
         return pactum
           .spec()
-          .patch('/books/1')
+          .patch(`/books/${bookId}`)
           .withHeaders({
             Authorization: `Bearer $S{adminToken}`,
           })
@@ -540,39 +573,56 @@ describe('App (e2e)', () => {
       it('should throw if user try to update book', () => {
         return pactum
           .spec()
-          .patch('/books/1')
+          .patch(`/books/${bookId}`)
           .withHeaders({
             Authorization: `Bearer $S{userToken}`,
           })
           .withBody({
             title: 'Dziady cz3',
-            author: 'Jan Kowalski',
+            authorId,
+            genreId,
           })
           .expectStatus(403);
       });
       it("should throw if author doesn't exists", () => {
         return pactum
           .spec()
-          .patch('/books/1')
+          .patch(`/books/${bookId}`)
           .withHeaders({
             Authorization: `Bearer $S{adminToken}`,
           })
           .withBody({
             title: 'Wladca Pierscieni',
-            author: 'DoesntExitThisAuthor',
+            authorId: 999,
+            genreId,
+          })
+          .expectStatus(404);
+      });
+      it("should throw if genre doesn't exists", () => {
+        return pactum
+          .spec()
+          .patch(`/books/${bookId}`)
+          .withHeaders({
+            Authorization: `Bearer $S{adminToken}`,
+          })
+          .withBody({
+            title: 'Wladca Pierscieni',
+            authorId,
+            genreId: 999,
           })
           .expectStatus(404);
       });
       it('should update book', () => {
         return pactum
           .spec()
-          .patch('/books/1')
+          .patch(`/books/${bookId}`)
           .withHeaders({
             Authorization: `Bearer $S{adminToken}`,
           })
           .withBody({
             title: 'Dziady cz3',
-            author: 'Jan Kowalski',
+            authorId,
+            genreId,
           })
           .expectStatus(200);
       });
@@ -589,7 +639,8 @@ describe('App (e2e)', () => {
         })
         .withBody({
           title: 'Harry Potter',
-          author: 'Jan Kowalski',
+          authorId: 1,
+          genreId: 1,
         });
     });
     describe('POST /books/:bookId/reviews', () => {
